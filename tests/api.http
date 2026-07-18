@@ -1,0 +1,241 @@
+### INVEST Backend — Pruebas HTTP (REST Client)
+### Instala la extensión "REST Client" en VS Code para ejecutar estas peticiones
+
+@baseUrl = http://localhost:3001
+
+# ──────────────────────────────────────────────────────────────────────────────
+# HEALTH CHECK
+# ──────────────────────────────────────────────────────────────────────────────
+
+### GET Health Check
+GET {{baseUrl}}/api/health
+
+# ──────────────────────────────────────────────────────────────────────────────
+# AUTH — REGISTRO
+# ──────────────────────────────────────────────────────────────────────────────
+
+### POST Registrar nuevo usuario (Estudiante)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Andres Bejar",
+  "email": "andres@ulima.edu.pe",
+  "password": "password123"
+}
+
+
+
+### POST Iniciar sesión
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "andres@ulima.edu.pe",
+  "password": "password123"
+}
+
+
+
+### POST Registrar nuevo usuario (Estudiante)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Seebastian Solis",
+  "email": "sebastian@ulima.edu.pe",
+  "password": "password123"
+}
+
+
+
+### POST Iniciar sesión
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "andres@ulima.edu.pe",
+  "password": "password123"
+}
+
+### POST Registrar otro usuario (Rodrigo - Admin)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Rodrigo Torres",
+  "email": "rodrigo@ulima.edu.pe",
+  "password": "password123"
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# AUTH — LOGIN (Extracción automática de Token)
+# ──────────────────────────────────────────────────────────────────────────────
+
+### POST Iniciar sesión
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rodrigo@ulima.edu.pe",
+  "password": "password123"
+}
+
+### 
+# Guardamos el token automáticamente de la respuesta del login
+@token = {{login.response.body.data.token}}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# USERS — PERFIL Y ONBOARDING
+# ──────────────────────────────────────────────────────────────────────────────
+
+### GET Obtener perfil del usuario autenticado
+GET {{baseUrl}}/api/users/profile
+Authorization: Bearer {{token}}
+
+### GET Verificar sesión (Alias de profile)
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{token}}
+
+### POST Completar onboarding (cuestionario Likert)
+POST {{baseUrl}}/api/users/onboarding
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "q1": 4,
+  "q2": 5,
+  "q3": 4
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ADMINISTRADOR (Requiere rol 'admin')
+# ──────────────────────────────────────────────────────────────────────────────
+
+### GET Listar todos los usuarios
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{token}}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# BILLETERAS
+# ──────────────────────────────────────────────────────────────────────────────
+
+### GET Listar mis billeteras
+GET {{baseUrl}}/api/wallets
+Authorization: Bearer {{token}}
+
+### POST Crear billetera en Soles
+# @name createWalletPEN
+POST {{baseUrl}}/api/wallets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Ahorros UPC",
+  "currency": "PEN",
+  "initialBalance": 500.00
+}
+
+###
+@walletPenId = {{createWalletPEN.response.body.data.wallet.id}}
+
+### POST Crear billetera en Dólares
+# @name createWalletUSD
+POST {{baseUrl}}/api/wallets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Inversiones USD",
+  "currency": "USD",
+  "initialBalance": 100.00
+}
+
+###
+@walletUsdId = {{createWalletUSD.response.body.data.wallet.id}}
+
+### DELETE Eliminar billetera
+DELETE {{baseUrl}}/api/wallets/{{walletPenId}}
+Authorization: Bearer {{token}}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# TRANSACCIONES
+# ──────────────────────────────────────────────────────────────────────────────
+
+### GET Todas las transacciones del usuario
+GET {{baseUrl}}/api/transactions
+Authorization: Bearer {{token}}
+
+### GET Transacciones de una billetera específica
+GET {{baseUrl}}/api/transactions?walletId={{walletPenId}}
+Authorization: Bearer {{token}}
+
+### POST Registrar ingreso (Sueldo)
+POST {{baseUrl}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "walletId": "{{walletPenId}}",
+  "type": "ingreso",
+  "amount": 1500.00,
+  "description": "Sueldo Enero",
+  "category": "salario"
+}
+
+### POST Registrar gasto (Almuerzo)
+POST {{baseUrl}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "walletId": "{{walletPenId}}",
+  "type": "gasto",
+  "amount": 50.00,
+  "description": "Almuerzo UPC",
+  "category": "alimentación"
+}
+
+### POST Gasto que supera saldo (debe fallar con 400 DomainError)
+POST {{baseUrl}}/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "walletId": "{{walletPenId}}",
+  "type": "gasto",
+  "amount": 9999999.00,
+  "description": "Compra imposible",
+  "category": "otro"
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# TRANSFERENCIAS
+# ──────────────────────────────────────────────────────────────────────────────
+
+### POST Transferir entre billeteras (misma moneda si existieran 2 en PEN)
+POST {{baseUrl}}/api/wallets/transfer
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "sourceWalletId": "{{walletPenId}}",
+  "targetWalletId": "{{walletUsdId}}",
+  "amount": 200.00,
+  "description": "Transferencia interna"
+}
+
+### POST Transferir PEN → USD (con conversión automática)
+POST {{baseUrl}}/api/wallets/transfer
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "sourceWalletId": "{{walletPenId}}",
+  "targetWalletId": "{{walletUsdId}}",
+  "amount": 370.00,
+  "description": "Conversión Soles a Dólares"
+}
