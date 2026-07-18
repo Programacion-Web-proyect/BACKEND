@@ -28,12 +28,9 @@ const app = express();
 
 // ── Middleware Global ─────────────────────────────────────────────────────────
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
-    'http://localhost:3000',   // Puerto de Vite configurado en vite.config.js
-    'http://localhost:5173',   // Puerto por defecto de Vite
-    'https://invest-front-five.vercel.app' // ¡Forzado para que nunca falle!
-  ],
+  origin: function (origin, callback) {
+    callback(null, true); // ¡Magia! Permite absolutamente cualquier URL (producción, pruebas, localhost)
+  },
   credentials: true,
 }));
 app.use(express.json());
