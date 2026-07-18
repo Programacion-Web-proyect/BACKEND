@@ -130,10 +130,11 @@ router.get('/users', authMiddleware, adminMiddleware, UserController.getAllUsers
 
 /**
  * PUT /api/users/:id/role
- * Promueve un usuario a administrador.
+ * Cambia el rol de un usuario.
  * Headers: Authorization: Bearer <token>
+ * Body: { role: 'admin' | 'student' }
  */
-router.put('/users/:id/role', authMiddleware, adminMiddleware, UserController.makeAdmin);
+router.put('/users/:id/role', authMiddleware, adminMiddleware, UserController.changeRole);
 
 /**
  * DELETE /api/users/:id

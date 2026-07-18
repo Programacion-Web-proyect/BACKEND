@@ -192,17 +192,20 @@ class UserController {
 
   /**
    * PUT /api/users/:id/role
-   * Promueve un usuario a administrador (solo admin).
+   * Cambia el rol de un usuario (solo admin).
    */
-  static async makeAdmin(req, res, next) {
+  static async changeRole(req, res, next) {
     try {
-      const MakeUserAdminUseCase = require('../../application/MakeUserAdminUseCase');
-      const useCase = new MakeUserAdminUseCase(userRepository);
-      const result = await useCase.execute({ userId: req.params.id });
+      const ChangeUserRoleUseCase = require('../../application/ChangeUserRoleUseCase');
+      const useCase = new ChangeUserRoleUseCase(userRepository);
+      const result = await useCase.execute({ 
+        userId: req.params.id,
+        role: req.body.role 
+      });
 
       return res.status(200).json({
         success: true,
-        message: 'Usuario promovido a administrador exitosamente.',
+        message: 'Rol de usuario actualizado exitosamente.',
         data: result,
       });
     } catch (error) {

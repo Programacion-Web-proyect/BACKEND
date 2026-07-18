@@ -103,10 +103,11 @@ class User {
   }
 
   /**
-   * Promueve a este usuario a rol de administrador.
+   * Cambia el rol de este usuario.
+   * @param {string} role - 'admin' o 'student'
    */
-  promoteToAdmin() {
-    this.role = 'admin';
+  assignRole(role) {
+    this.role = role;
   }
 
   /**
