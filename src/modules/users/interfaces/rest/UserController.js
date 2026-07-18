@@ -189,6 +189,45 @@ class UserController {
       next(error);
     }
   }
+
+  /**
+   * PUT /api/users/:id/role
+   * Promueve un usuario a administrador (solo admin).
+   */
+  static async makeAdmin(req, res, next) {
+    try {
+      const MakeUserAdminUseCase = require('../../application/MakeUserAdminUseCase');
+      const useCase = new MakeUserAdminUseCase(userRepository);
+      const result = await useCase.execute({ userId: req.params.id });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Usuario promovido a administrador exitosamente.',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * DELETE /api/users/:id
+   * Elimina un usuario (solo admin).
+   */
+  static async deleteUser(req, res, next) {
+    try {
+      const DeleteUserUseCase = require('../../application/DeleteUserUseCase');
+      const useCase = new DeleteUserUseCase(userRepository);
+      await useCase.execute({ userId: req.params.id });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Usuario eliminado exitosamente.',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = UserController;

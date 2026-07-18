@@ -103,6 +103,13 @@ class User {
   }
 
   /**
+   * Promueve a este usuario a rol de administrador.
+   */
+  promoteToAdmin() {
+    this.role = 'admin';
+  }
+
+  /**
    * Serializa la entidad para retorno seguro al cliente (sin passwordHash).
    *
    * @returns {Object} Representación pública del usuario

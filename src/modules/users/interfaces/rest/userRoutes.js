@@ -128,4 +128,18 @@ const adminMiddleware = require('../../../../shared/infrastructure/adminMiddlewa
  */
 router.get('/users', authMiddleware, adminMiddleware, UserController.getAllUsers);
 
+/**
+ * PUT /api/users/:id/role
+ * Promueve un usuario a administrador.
+ * Headers: Authorization: Bearer <token>
+ */
+router.put('/users/:id/role', authMiddleware, adminMiddleware, UserController.makeAdmin);
+
+/**
+ * DELETE /api/users/:id
+ * Elimina un usuario por su ID.
+ * Headers: Authorization: Bearer <token>
+ */
+router.delete('/users/:id', authMiddleware, adminMiddleware, UserController.deleteUser);
+
 module.exports = router;

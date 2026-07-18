@@ -107,6 +107,17 @@ class UserRepository extends IUserRepository {
     });
     return records.map((record) => this._toDomain(record));
   }
+
+  /**
+   * Elimina un usuario de la base de datos por su ID.
+   * @param {string} id
+   * @returns {Promise<void>}
+   */
+  async delete(id) {
+    await UserModel.destroy({
+      where: { id },
+    });
+  }
 }
 
 module.exports = UserRepository;

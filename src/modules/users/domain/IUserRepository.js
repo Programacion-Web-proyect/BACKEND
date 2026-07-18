@@ -58,6 +58,15 @@ class IUserRepository {
   async findAll() {
     throw new Error('IUserRepository.findAll() must be implemented');
   }
+
+  /**
+   * Elimina un usuario por su ID único.
+   * @param {string} id
+   * @returns {Promise<void>}
+   */
+  async delete(id) {
+    throw new Error('IUserRepository.delete() must be implemented');
+  }
 }
 
 module.exports = IUserRepository;
